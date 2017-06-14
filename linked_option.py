@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import sys
 if sys.version_info[0] >= 3:
     import tkinter as tk
@@ -14,49 +14,57 @@ class App(tk.Frame):
         self.dict = {'Non-DMZ': ['APDC', 'EMEA Powergate', 'EMEA Romford', 'Gonfreville', 'Houston', 'San Ramon', 'San Ramon Lab', 'Singapore'],
                      'DMZ': ['DMZ APDC', 'DMZ EMEA Powergate', 'DMZ Houston', 'DMZ San Antonio', 'DMZ Singapore']}
         self.vcloc = {'Singapore': 'vc-sgdc1.chevron.com', 'APDC' : 'vc-ghp-f07058.chevron.com', 'EMEA Powergate' : 'vc-lonpwg.chevron.com'}
-        
-        self.variable_a = tk.StringVar(self)
-        self.variable_b = tk.StringVar(self)
-        self.variable_c = tk.StringVar(self)
 
-        self.variable_a.trace('w', self.update_DMZ)
-        self.variable_b.trace('w', self.update_VC)
+        self.var_dmz = tk.StringVar(self)
+        self.var_loc = tk.StringVar(self)
+        self.var_vc = tk.StringVar(self)
+
+        self.var_dmz.trace('w', self.update_DMZ)
+        self.var_loc.trace('w', self.update_VC)
         
-        self.optionmenu_a = tk.OptionMenu(self, self.variable_a, *self.dict.keys())
-        self.optionmenu_b = tk.OptionMenu(self, self.variable_b, '')
-        self.optionmenu_c = tk.OptionMenu(self, self.variable_c, '')
+        self.om_dmz = tk.OptionMenu(self, self.var_dmz, *self.dict.keys())
+        self.om_loc = tk.OptionMenu(self, self.var_loc, '')
+        self.om_vc = tk.OptionMenu(self, self.var_vc, '')
+        self.om_dmz.configure(width=30)
+        self.om_loc.configure(width=30)
+        self.om_vc.configure(width=30)
         #self.vcLabel = tk.Label(self, command=self.update_VC)
-       
-        self.variable_a.set('Non-DMZ')
-        self.variable_b.set('APDC')
+        b1 = tk.Button(self, text="Submit", width=20, command=self.print_sel)
 
-        self.optionmenu_a.pack()
-        self.optionmenu_b.pack()
-        self.optionmenu_c.pack()
-       
-        #self.vcLabel.pack()
-        self.pack()
+        self.var_dmz.set('Non-DMZ')
+        self.var_loc.set('APDC')
+
+        self.om_dmz.grid()
+        self.om_loc.grid()
+        self.om_vc.grid()
+        b1.grid()
+        self.grid()
         
     def update_DMZ(self, *args):
-        DVCs = self.dict[self.variable_a.get()]
-        self.variable_b.set(DVCs[0])
+        DVCs = self.dict[self.var_dmz.get()]
+        self.var_loc.set(DVCs[0])
 
-        menu = self.optionmenu_b['menu']
+        menu = self.om_loc['menu']
         menu.delete(0, 'end')
 
         for DVC in DVCs:
-            menu.add_command(label=DVC, command=lambda dvcenter=DVC: self.variable_b.set(dvcenter))
+            menu.add_command(label=DVC, command=lambda dvcenter=DVC: self.var_loc.set(dvcenter))
             
     def update_VC(self, *args):
-        VCs = self.vcloc[self.variable_b.get()]
-        self.variable_c.set(VCs)
+        VCs = self.vcloc[self.var_loc.get()]
+        self.var_vc.set(VCs)
         
         
-        menu = self.optionmenu_c['menu']
+        menu = self.om_vc['menu']
         menu.delete(0, 'end')
                 
-        menu.add_command(label=VCs, command=lambda vcenter=VCs: self.variable_c.set(vcenter))
-                
+        menu.add_command(label=VCs, command=lambda vcenter=VCs: self.var_vc.set(vcenter))
+
+    def print_sel(self):
+        m1 = tkMessageBox.showinfo("Hello", var_dmz.get())
+        print self.var_dmz.get()
+        print self.var_loc.get()
+        print self.var_vc.get()
         
 if __name__ == "__main__":
     root = tk.Tk()
